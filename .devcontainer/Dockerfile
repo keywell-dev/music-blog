@@ -32,4 +32,6 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
     && chown -R ${CONTAINER_USER} /commandhistory \
     && echo "$SNIPPET" >> "/home/${CONTAINER_USER}/.bashrc"
 
+RUN mkdir -p /workspace && chown -R ${CONTAINER_USER} /workspace
+
 USER $CONTAINER_USER
