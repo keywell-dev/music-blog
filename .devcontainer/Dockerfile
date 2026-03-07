@@ -34,4 +34,7 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
 
 RUN mkdir -p /workspace && chown -R ${CONTAINER_USER} /workspace
 
+WORKDIR /workspace/frontend
+RUN npm install contentlayer date-fns
+
 USER $CONTAINER_USER
