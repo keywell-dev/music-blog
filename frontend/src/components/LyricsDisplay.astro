@@ -1,0 +1,53 @@
+---
+interface Props {
+  lyrics: Array<{ line: string; annotation: string }>;
+}
+
+const { lyrics } = Astro.props;
+---
+
+<section class="lyrics-container">
+  {
+    lyrics.map((lyric, index) => (
+      <div class="lyric-row" key={index}>
+        <div class="lyric-line">{lyric.line}</div>
+        {lyric.annotation && <div class="annotation">{lyric.annotation}</div>}
+      </div>
+    ))
+  }
+</section>
+
+<style>
+  .lyrics-container {
+    display: grid;
+    gap: 2rem;
+    max-width: 900px;
+  }
+
+  .lyric-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .lyric-line {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    padding: 1rem;
+    background: #f5f5f5;
+    border-left: 4px solid #ffb81c;
+  }
+
+  .annotation {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #555;
+    padding: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .lyric-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

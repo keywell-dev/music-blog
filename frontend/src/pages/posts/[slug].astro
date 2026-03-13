@@ -1,0 +1,78 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import LyricsDisplay from "../../components/LyricsDisplay.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts");
+  return posts.map((post: typeof posts[number]) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+type Props = {
+  post: Awaited<ReturnType<typeof getCollection<"posts">>>[number];
+};
+
+const { post } = Astro.props as Props;
+const { Content } = await post.render();
+---
+
+<Layout>
+  <article>
+    <h1>{post.data.title}</h1>
+    {
+      post.data.artist && (
+        <p>
+          <strong>Artist:</strong> {post.data.artist}
+        </p>
+      )
+    }
+    {
+      post.data.album && (
+        <p>
+          <strong>Album:</strong> {post.data.album}
+        </p>
+      )
+    }
+
+    <div class="content">
+      <Content />
+    </div>
+
+    {
+      post.data.lyrics && (
+        <div class="lyrics-section">
+          <h2>Lyrics & Analysis</h2>
+          <LyricsDisplay lyrics={post.data.lyrics} />
+        </div>
+      )
+    }
+  </article>
+</Layout>
+
+<style>
+  article {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  h1 {
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .content {
+    margin-top: 2rem;
+  }
+
+  .lyrics-section {
+    margin-top: 3rem;
+  }
+</style>
