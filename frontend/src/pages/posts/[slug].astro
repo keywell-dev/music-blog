@@ -5,14 +5,14 @@ import LyricsDisplay from "../../components/LyricsDisplay.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
-  return posts.map((post: typeof posts[number]) => ({
+  return posts.map((post: (typeof posts)[number]) => ({
     params: { slug: post.slug },
     props: { post },
   }));
 }
 
 type Props = {
-  post: Awaited<ReturnType<typeof getCollection<"posts">>>[number];
+  post: Awaited<ReturnType<typeof getCollection>>[number];
 };
 
 const { post } = Astro.props as Props;
