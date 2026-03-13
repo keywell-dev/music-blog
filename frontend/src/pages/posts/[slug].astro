@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
-import LyricsDisplay from "../../components/LyricsDisplay.astro";
+import PostPage from "../../components/PostPage.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
@@ -45,7 +45,7 @@ const { Content } = await post.render();
       post.data.lyrics && (
         <div class="lyrics-section">
           <h2>Lyrics & Analysis</h2>
-          <LyricsDisplay lyrics={post.data.lyrics} />
+          <PostPage lyrics={post.data.lyrics} />
         </div>
       )
     }
