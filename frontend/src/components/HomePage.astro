@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import PostPage from "./PostPage.astro";
 
 const posts = await getCollection("posts");
 const latestPost = posts[posts.length - 1];
@@ -8,40 +9,62 @@ const olderPosts = posts.slice(0, -1).reverse();
 const { Content } = await latestPost.render();
 ---
 
-<div class="max-w-6xl mx-auto px-4 py-8 min-h-screen">
-  <!-- Featured Post - Full Content -->
-  <section class="mb-12">
-    <article
-      class="prose prose-sm md:prose-base lg:prose-lg max-w-none prose-invert"
-    >
-      <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">
-        {latestPost.data.title}
-      </h1>
-      <div class="text-gray-400 mb-8">
-        <p>{latestPost.data.pubDate?.toLocaleDateString()}</p>
+<div class="max-w-275 mx-auto p-8 text-white">
+  <!-- Latest Post - Full Content -->
+  <section>
+    <article>
+      <div class="max-w-162.5 mb-6">
+        <h1 class="text-3xl font-bold mb-2">{latestPost.data.title}</h1>
+        {
+          latestPost.data.artist && (
+            <p class="text-neutral-400 my-1">
+              <strong>Artist:</strong> {latestPost.data.artist}
+            </p>
+          )
+        }
+        {
+          latestPost.data.album && (
+            <p class="text-neutral-400 my-1">
+              <strong>Album:</strong> {latestPost.data.album}
+            </p>
+          )
+        }
       </div>
-      <Content />
+
+      <div class="max-w-[650px] mt-4 mb-10 text-neutral-300 leading-relaxed">
+        <content></content>
+      </div>
+
+      {
+        latestPost.data.lyrics && latestPost.data.lyrics.length > 0 && (
+          <div class="border-t border-neutral-700 pt-8">
+            <PostPage lyrics={latestPost.data.lyrics} />
+          </div>
+        )
+      }
     </article>
   </section>
 
-  <!-- Older Posts - Cards -->
+  <!-- Older Posts -->
   {
     olderPosts.length > 0 && (
-      <section>
-        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white">
-          Earlier Posts
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section class="border-t border-neutral-700 mt-12 pt-8">
+        <h2 class="text-2xl font-semibold mb-4">Earlier Posts</h2>
+        <div class="grid grid-cols-1 gap-4">
           {olderPosts.map((post) => (
-            <a href={`/posts/${post.slug}`} class="group">
-              <article class="bg-gray-700 border border-gray-600 rounded-lg p-6 hover:shadow-lg transition-shadow h-full">
-                <h3 class="text-xl font-bold mb-3 group-hover:text-blue-600 transition-colors">
-                  {post.data.title}
-                </h3>
-                <p class="text-gray-600 text-sm">
-                  {post.data.pubDate?.toLocaleDateString()}
+            <a
+              href={`/posts/${post.slug}`}
+              class="block p-5 border border-neutral-700 rounded-lg no-underline text-inherit transition-colors duration-200 hover:border-neutral-500"
+            >
+              <h3 class="text-lg mb-1">{post.data.title}</h3>
+              {post.data.artist && (
+                <p class="text-neutral-400 text-sm my-0.5">
+                  {post.data.artist}
                 </p>
-              </article>
+              )}
+              {post.data.album && (
+                <p class="text-neutral-400 text-sm my-0.5">{post.data.album}</p>
+              )}
             </a>
           ))}
         </div>
