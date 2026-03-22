@@ -1,0 +1,51 @@
+---
+import { getCollection } from "astro:content";
+
+const posts = await getCollection("posts");
+const latestPost = posts[posts.length - 1];
+const olderPosts = posts.slice(0, -1).reverse();
+
+const { Content } = await latestPost.render();
+---
+
+<div class="max-w-6xl mx-auto px-4 py-8 min-h-screen">
+  <!-- Featured Post - Full Content -->
+  <section class="mb-12">
+    <article
+      class="prose prose-sm md:prose-base lg:prose-lg max-w-none prose-invert"
+    >
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">
+        {latestPost.data.title}
+      </h1>
+      <div class="text-gray-400 mb-8">
+        <p>{latestPost.data.pubDate?.toLocaleDateString()}</p>
+      </div>
+      <Content />
+    </article>
+  </section>
+
+  <!-- Older Posts - Cards -->
+  {
+    olderPosts.length > 0 && (
+      <section>
+        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white">
+          Earlier Posts
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {olderPosts.map((post) => (
+            <a href={`/posts/${post.slug}`} class="group">
+              <article class="bg-gray-700 border border-gray-600 rounded-lg p-6 hover:shadow-lg transition-shadow h-full">
+                <h3 class="text-xl font-bold mb-3 group-hover:text-blue-600 transition-colors">
+                  {post.data.title}
+                </h3>
+                <p class="text-gray-600 text-sm">
+                  {post.data.pubDate?.toLocaleDateString()}
+                </p>
+              </article>
+            </a>
+          ))}
+        </div>
+      </section>
+    )
+  }
+</div>

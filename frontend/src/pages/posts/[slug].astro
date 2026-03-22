@@ -1,0 +1,91 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import PostPage from "../../components/PostPage.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts");
+  return posts.map((post: (typeof posts)[number]) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+type Props = {
+  post: Awaited<ReturnType<typeof getCollection>>[number];
+};
+
+const { post } = Astro.props as Props;
+const { Content } = await post.render();
+---
+
+<Layout>
+  <article>
+    <div class="song-header">
+      <h1>{post.data.title}</h1>
+      {
+        post.data.artist && (
+          <p class="meta">
+            <strong>Artist:</strong> {post.data.artist}
+          </p>
+        )
+      }
+      {
+        post.data.album && (
+          <p class="meta">
+            <strong>Album:</strong> {post.data.album}
+          </p>
+        )
+      }
+    </div>
+
+    <div class="content">
+      <Content />
+    </div>
+
+    {
+      post.data.lyrics && (
+        <div class="lyrics-section">
+          <PostPage lyrics={post.data.lyrics} />
+        </div>
+      )
+    }
+  </article>
+</Layout>
+
+<style>
+  article {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: #fff;
+  }
+
+  .song-header {
+    max-width: 650px;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .meta {
+    color: #aaa;
+    margin: 0.25rem 0;
+  }
+
+  .content {
+    max-width: 650px;
+    margin-top: 1rem;
+    margin-bottom: 2.5rem;
+    color: #ccc;
+    line-height: 1.7;
+  }
+
+  .lyrics-section {
+    border-top: 1px solid #444;
+    padding-top: 2rem;
+  }
+</style>
