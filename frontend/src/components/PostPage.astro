@@ -6,49 +6,201 @@ interface Props {
 const { lyrics } = Astro.props;
 ---
 
-<section class="lyrics-container">
-  {
-    lyrics.map((lyric, index) => (
-      <div class="lyric-row" key={index}>
-        <div class="lyric-line">{lyric.line}</div>
-        {lyric.annotation && <div class="annotation">{lyric.annotation}</div>}
-      </div>
-    ))
+<div class="genius-layout">
+  <!-- Left column: Lyrics -->
+  <div class="lyrics-column">
+    {
+      lyrics.map((lyric, index) => (
+        <p
+          class={`lyric-line ${lyric.annotation ? "has-annotation" : ""} ${lyric.line === "" ? "stanza-break" : ""}`}
+          data-index={index}
+        >
+          {lyric.line}
+        </p>
+      ))
+    }
+  </div>
+
+  <!-- Right column: Annotation panel -->
+  <div class="annotation-column">
+    {
+      lyrics.map((lyric, index) =>
+        lyric.annotation ? (
+          <div class="annotation-panel" data-annotation-index={index}>
+            <div class="annotation-header">
+              <span class="genius-logo">G</span> Genius Annotation
+            </div>
+            <div class="annotation-body">
+              <p>{lyric.annotation}</p>
+            </div>
+          </div>
+        ) : null,
+      )
+    }
+  </div>
+</div>
+
+<script>
+  document.addEventListener("astro:page-load", initLyrics);
+  document.addEventListener("DOMContentLoaded", initLyrics);
+
+  function initLyrics() {
+    const lines = document.querySelectorAll<HTMLElement>(
+      ".lyric-line.has-annotation",
+    );
+    const panels = document.querySelectorAll<HTMLElement>(".annotation-panel");
+
+    lines.forEach((line) => {
+      line.addEventListener("click", () => {
+        const index = line.dataset.index;
+        const isActive = line.classList.contains("active");
+
+        // Deselect all
+        lines.forEach((l) => l.classList.remove("active"));
+        panels.forEach((p) => p.classList.remove("visible"));
+
+        // If wasn't active, select it
+        if (!isActive) {
+          line.classList.add("active");
+          const panel = document.querySelector<HTMLElement>(
+            `.annotation-panel[data-annotation-index="${index}"]`,
+          );
+          if (panel) {
+            panel.classList.add("visible");
+            // Position the panel next to the clicked line
+            const lineRect = line.getBoundingClientRect();
+            const columnRect = panel.parentElement!.getBoundingClientRect();
+            panel.style.top = `${line.offsetTop}px`;
+          }
+        }
+      });
+    });
   }
-</section>
+</script>
 
 <style>
-  .lyrics-container {
+  .genius-layout {
     display: grid;
-    gap: 2rem;
-    max-width: 900px;
+    grid-template-columns: 1fr 380px;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
   }
 
-  .lyric-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+  /* --- Left column: Lyrics --- */
+  .lyrics-column {
+    border-right: 1px solid #444;
+    padding-right: 2rem;
   }
 
   .lyric-line {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    padding: 1rem;
-    background: #3d3d3d;
-    border-left: 4px solid #ffb81c;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    padding: 2px 6px;
+    margin: 0;
     color: #fff;
+    cursor: default;
+    transition: background-color 0.15s ease;
   }
 
-  .annotation {
+  .lyric-line.stanza-break {
+    min-height: calc(1.8em + 12px);
+  }
+
+  .lyric-line.has-annotation {
+    background-color: rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    border-radius: 2px;
+  }
+
+  .lyric-line.has-annotation:hover {
+    background-color: #e8a820;
+    color: #000;
+  }
+
+  .lyric-line.has-annotation.active {
+    background-color: #ffb81c;
+    color: #000;
+  }
+
+  /* --- Right column: Annotations --- */
+  .annotation-column {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .annotation-panel {
+    display: none;
+    position: absolute;
+    left: 2rem;
+    right: 0;
+    background: transparent;
+  }
+
+  .annotation-panel.visible {
+    display: block;
+  }
+
+  .annotation-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #999;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .genius-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: #ffb81c;
+    color: #000;
+    font-weight: 800;
+    font-size: 0.8rem;
+    border-radius: 3px;
+  }
+
+  .annotation-body {
     font-size: 0.95rem;
-    line-height: 1.6;
+    line-height: 1.7;
     color: #ccc;
-    padding: 1rem;
   }
 
+  .annotation-body p {
+    margin: 0 0 0.75rem;
+  }
+
+  /* --- Mobile --- */
   @media (max-width: 768px) {
-    .lyric-row {
+    .genius-layout {
       grid-template-columns: 1fr;
+    }
+
+    .lyrics-column {
+      border-right: none;
+      padding-right: 0;
+    }
+
+    .annotation-column {
+      padding-left: 0;
+      position: static;
+    }
+
+    .annotation-panel {
+      position: static;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 3px solid #ffb81c;
+      border-radius: 4px;
     }
   }
 </style>
