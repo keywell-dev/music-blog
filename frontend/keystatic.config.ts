@@ -1,9 +1,7 @@
 import { config, fields, collection } from '@keystatic/core';
 
 export default config({
-  storage: process.env.NODE_ENV === 'production'
-    ? { kind: 'github', repo: 'keywell-dev/music-blog' }
-    : { kind: 'local' },
+  storage: { kind: 'github', repo: 'keywell-dev/music-blog' },
   collections: {
     posts: collection({
       label: 'Posts',
